@@ -2,32 +2,32 @@
 #include <Wire.h>
 
 #define MAX_SENSORS 10
-#define MAX_LETTERS 10
-#define MAX_INSTRUCTIONS 3
 
-int numOfSens = 0;
+uint8_t numOfSens = 0;
 
-typedef struct{
+typedef struct {
 
-char name[MAX_LETTERS];
+String name;
 
-uint8_t reg;
+uint8_t address;
 
-int nrBytesReturned;
+uint8_t regByte;
+
+uint8_t nrBytesReturned = ;
 
 uint8_t values[nrBytesReturned];
   
-}Instruction;
+} Instruction ;
+
+
 
 typedef struct{
 
-char name[MAX_LETTERS];
+String name;
 
-int address;
+uint8_t address;
 
-int numberInstructions= 0;
-
-Instruction instructions[MAX_INSTRUCTIONS];
+Instruction instructions[];
   
 }Sensor;
 
@@ -39,5 +39,10 @@ Instruction instructions[MAX_INSTRUCTIONS];
 
 Sensor sensors[MAX_SENSORS];
 
-uint8_t addSensor();
+
+
+uint8_t addSensor(String name, uint8_t address);
+
 uint8_t addInstruction();
+
+uint8_t readSensor ();
