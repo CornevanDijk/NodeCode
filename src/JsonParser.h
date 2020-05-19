@@ -1,20 +1,21 @@
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <SoftwareSerial.h>
+// #include <Arduino.h>
+// #include <ArduinoJson.h>
+// #include <SoftwareSerial.h>
 
-#define JSON_SERIAL_RX 2
-#define JSON_SERIAL_TX 3
+// #include "I2Ccontroller.h"
 
-SoftwareSerial JsonSerial(JSON_SERIAL_RX, JSON_SERIAL_TX);
+// #define JSON_SERIAL_RX 2
+// #define JSON_SERIAL_TX 3
 
-
-//
-StaticJsonDocument<200> doc;
-
-DeserializationError error;
+// SoftwareSerial JsonSerial(JSON_SERIAL_RX, JSON_SERIAL_TX);
 
 
-int parserSetup();
+// StaticJsonDocument<200> temp;
+
+// DeserializationError error;
+
+
+// int parserSetup();
 
 
 
