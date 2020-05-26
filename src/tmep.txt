@@ -1,0 +1,18 @@
+while(1){};
+
+{\"type\":1,\"sensNr\":1,\"sensAdd\":104}
+
+
+/** write a single bit in an 8-bit device register.
+ * @param devAddr I2C slave device address
+ * @param regAddr Register regAddr to write to
+ * @param bitNum Bit position to write (0-7)
+ * @param value New bit value to write
+ * @return Status of operation (true = success)
+ */
+bool I2Cdev::writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data) {
+    uint8_t b;
+    readByte(devAddr, regAddr, &b);
+    b = (data != 0) ? (b | (1 << bitNum)) : (b & ~(1 << bitNum));
+    return writeByte(devAddr, regAddr, b);
+}

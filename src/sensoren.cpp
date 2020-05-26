@@ -183,26 +183,26 @@
 //     float LPS331::readPressureInchesHg(void)
 //     {
 //     return (float)readPressureRaw() / 138706.5;
+// //     }
+
+// //     // reads pressure and returns raw 24-bit sensor output
+//     int32_t LPS331::readPressureRaw(void)
+//     {
+//     Wire.beginTransmission(address);
+//     // assert MSB to enable register address auto-increment
+//     Wire.write(LPS331_PRESS_OUT_XL | (1 << 7));
+//     Wire.endTransmission();
+//     Wire.requestFrom(address, (byte)3);
+
+//     while (Wire.available() < 3);
+
+//     uint8_t pxl = Wire.read();
+//     uint8_t pl = Wire.read();
+//     uint8_t ph = Wire.read();
+
+//     // combine bytes
+//     return (int32_t)(int8_t)ph << 16 | (uint16_t)pl << 8 | pxl;
 //     }
-
-//     // reads pressure and returns raw 24-bit sensor output
-    // int32_t LPS331::readPressureRaw(void)
-    // {
-    // Wire.beginTransmission(address);
-    // // assert MSB to enable register address auto-increment
-    // Wire.write(LPS331_PRESS_OUT_XL | (1 << 7));
-    // Wire.endTransmission();
-    // Wire.requestFrom(address, (byte)3);
-
-    // while (Wire.available() < 3);
-
-    // uint8_t pxl = Wire.read();
-    // uint8_t pl = Wire.read();
-    // uint8_t ph = Wire.read();
-
-    // // combine bytes
-    // return (int32_t)(int8_t)ph << 16 | (uint16_t)pl << 8 | pxl;
-    // }
 
 //     // reads temperature in degrees C
 //     float LPS331::readTemperatureC(void)

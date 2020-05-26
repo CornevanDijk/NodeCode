@@ -3,42 +3,55 @@
 
 Controller controller;
 
-void addTestSensors()
+void testJsonAdd()
 {
-  controller.addSensor(1, 0X68);
-  controller.addInstruction(1, 1, 0x3B, 14);
+  DynamicJsonDocument doc(1024);
+  DynamicJsonDocument doc2(1024);
+  DynamicJsonDocument doc3(1024);
 
+  char json[] = "{\"type\":1,\"sensNr\":1,\"sensAdd\":104}";
+  char json2[] = "{\"type\":2,\"sensNr\":1,\"instNr\":1,\"reqB\":59,\"BRet\":14}";
+  char json3[] = "{\"type\":4,\"sensAdd\":104,\"reqB\":107,\"bNr\":6,\"bVal\":1}";
+
+  deserializeJson(doc, json);
+  controller.parseData(doc);
+
+  delay(100);
   
+  deserializeJson(doc2, json2);
+  controller.parseData(doc2);
+
+  delay(100);
+  
+  deserializeJson(doc3, json3);
+  controller.parseData(doc3);
+
+  doc.clear();
+  doc2.clear();
+  doc3.clear();
 }
 
 void setup() 
 {
   controller.begin();
-  Serial.begin(9600);
+  testJsonAdd();
 }
 
 void loop() 
 {
-  addTestSensors();
-  Serial.println("SensorNumber");
-  Serial.println(controller.sensors[0].sensorNumber);
-  Serial.println("SensorAddress");
-  Serial.println(controller.sensors[0].address); 
-  delay(500);
-  
-  //controller.printSensors();
-  controller.refresh();
-  //controller.printSensors();
+  static unsigned long lastMillis = 0;
 
-  for( int i = 0; i < 14; i++)
+  controller.checkMessages();
+
+  if((millis() - lastMillis) > 1000)
   {
-    Serial.println("Byte");
-    Serial.println(i);
-    Serial.println(controller.sensors[0].sensorInstructions[0].values[i]);
+    controller.refresh();
+    controller.printSensors();
+    
+    lastMillis = millis();
+     Serial.println("Here");
   }
-  while (1)
-  {
-    /* code */
-  }
-  
+
+  delay(100);
+
 }
