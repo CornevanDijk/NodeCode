@@ -8,6 +8,7 @@
 #define MAX_SENSORS 10
 #define MAX_INSTRUCTIONS 4
 #define MAX_NR_BYTES_RETURNED 20
+#define SENSOR_NAME_LENGTH 4
 
 
 
@@ -15,23 +16,27 @@
 
 struct Instruction {
 
-    Instruction();
+    Instruction(){};
 
-    Instruction(uint8_t instructionnumber, uint8_t reqbyte, uint8_t nrbytesReturned)
+    Instruction(uint8_t instructionnumber, uint8_t registeraddress, uint8_t bitnum, bool bitvalue, uint8_t nrbytesReturned)
     {
         instructionNumber = instructionnumber;
-        reqByte = reqbyte;
+        registerAddress = registeraddress;
+        bitNum = bitnum;
+        bitValue = bitvalue;
         nrBytesReturned = nrbytesReturned;
     }
 
-
-
     uint8_t instructionNumber = 0;
 
-    uint8_t reqByte = 0;
+    uint8_t registerAddress = 0;
 
+    uint8_t bitNum = 0;
+
+    bool bitValue = 0;
+    
     uint8_t nrBytesReturned = 0;
-
+    
     uint8_t values[MAX_NR_BYTES_RETURNED];
 
   
@@ -41,25 +46,26 @@ struct Instruction {
 
 struct Sensor{
 
-    Sensor();
+    Sensor(){};
 
-    Sensor(uint8_t sensornumber, uint8_t _address )
+    Sensor(uint8_t sensornumber, uint8_t sensoraddress )
     {
         sensorNumber = sensornumber;
-        address = _address;
+        sensorAddress = sensoraddress;
     }
 
     ~Sensor()
     {
+
     }
 
     uint8_t sensorNumber = 0;
 
-    uint8_t address = 0;
+    uint8_t sensorAddress = 0;
 
     uint8_t nrInstructions = 0; 
 
-    Instruction sensorInstructions[];
+    Instruction sensorInstructions[MAX_INSTRUCTIONS];
     
 } ;
 
@@ -79,23 +85,21 @@ class Controller
 
     ~Controller(){};
 
-    uint8_t addSensor(uint8_t sensornumber, uint8_t address);
-    
-    uint8_t addInstruction(uint8_t sensornumber, uint8_t instructionnumber ,uint8_t reqbyte, uint8_t nrbytesreturned);
-
-    uint8_t execInstruction(uint8_t sensoraddress, uint8_t reqbyte, uint8_t nrbytesreturned);
+   
 
     void printSensors();
 
     void refresh();
     
-    Sensor sensors[];
+    Sensor sensors[MAX_SENSORS];
 
     /* COMMUNICATION */
 
     void checkMessages();
 
-     uint8_t parseData(DynamicJsonDocument doc);
+    uint8_t parseData(DynamicJsonDocument doc);
+
+    void simpleJson();
     
     private:
 
@@ -111,21 +115,19 @@ class Controller
 
     uint8_t readSensor(Sensor sensor, Instruction instruction);
 
+    uint8_t addSensor( uint8_t sensornumber, uint8_t address);
+    
+    uint8_t addInstruction(uint8_t sensornumber, uint8_t instructionnumber ,uint8_t registeraddress, uint8_t bitnum, bool bitvalue, uint8_t nrbytesreturned);
 
+    uint8_t execInstruction(uint8_t sensoraddress, uint8_t reqbyte, uint8_t nrbytesreturned);
 
     /* COMMUNICATION */
 
-    uint8_t sendData(Sensor sensor, Instruction Instruction);
+    uint8_t sendData(uint8_t sensornumber, uint8_t instructionnumber, uint8_t values[]);
 
     uint8_t receiveData();
 
+    void returnFault(Sensor sensor, Instruction insruction);
+
 };
-
-
-
-
-
-//return (int16_t)(th << 8 | tl); bij 2 bytes returned
-//return (int32_t)(int8_t)ph << 16 | (uint16_t)pl << 8 | pxl; bij 3 bytes returned
-
 #endif
