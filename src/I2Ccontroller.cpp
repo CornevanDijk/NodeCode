@@ -115,7 +115,8 @@ void Controller::refresh()
                     {
                         if (readFromReg(sensors[i].sensorInstructions[j].registerAddress, sensors[i].sensorInstructions[j].nrBytesReturned, sensors[i].sensorInstructions[j].values))
                         {
-                            sendData(sensors[i].sensorNumber, sensors[i].sensorInstructions[j].instructionNumber, sensors[i].sensorInstructions[j].values);
+                            sendData(sensors[i].sensorNumber, sensors[i].sensorInstructions[j].instructionNumber, sensors[i].sensorInstructions[j].values, sensors[i].sensorInstructions[j].nrBytesReturned);
+                            Serial.println("yeet");
                         }
                     }
                 }
@@ -124,6 +125,33 @@ void Controller::refresh()
         }
     }
 }
+
+// void Controller::refresh2()
+// {
+//     for (int i = 0; i < MAX_SENSORS; i++)
+//     {
+//         if(sensors[i].sensorNumber != 0)
+//         {
+//             for (int j = 0; j < MAX_INSTRUCTIONS; j++)
+//             {
+//                 if(sensors[i].sensorInstructions[j].instructionNumber != 0)
+//                 {
+//                     if(connection.writeBit(sensors[i].sensorAddress, sensors[i].sensorInstructions[j].registerAddress, sensors[i].sensorInstructions[j].bitNum, sensors[i].sensorInstructions[j].bitValue))
+//                     {
+//                         if (connection.readBytes(sensors[i].sensorAddress, sensors[i].sensorInstructions[j].registerAddress, sensors[i].sensorInstructions[j].nrBytesReturned, sensors[i].sensorInstructions[j].values))
+//                         {
+//                             if(sensors[i].sensorInstructions[j].nrBytesReturned)
+//                             {
+//                                 sendData(sensors[i].sensorNumber, sensors[i].sensorInstructions[j].instructionNumber, sensors[i].sensorInstructions[j].values, sensors[i].sensorInstructions[j].nrBytesReturned);
+//                                 Serial.println("yeet");
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 uint8_t Controller::readFromReg( uint8_t address, uint8_t nrbytesreturned, uint8_t values[] )
@@ -143,8 +171,6 @@ uint8_t Controller::readFromReg( uint8_t address, uint8_t nrbytesreturned, uint8
         }
     };
     
-     
-
     if(succes)
     {
         for(int i = 0; i < nrbytesreturned; i++)
@@ -189,22 +215,27 @@ uint8_t Controller::writeSingleInReg(uint8_t sensoraddress, uint8_t regaddress, 
 
 /* COMMUNICATION */
 
-uint8_t Controller::sendData(uint8_t sensornumber, uint8_t instructionnumber, uint8_t values[])
+uint8_t Controller::sendData(uint8_t sensornumber, uint8_t instructionnumber, uint8_t values[], uint8_t nrbytesreturned)
 {
     uint8_t succes = 0;
 
     DynamicJsonDocument doc(1024);
 
-    delay(100);
-    doc["SensNr"] = sensornumber;
-    doc["InsNr"] = instructionnumber;
-    delay(100);
-    serializeJson(doc, Serial);
-    succes = 1;
-    delay(100);
+    doc["sensNr"].set(sensornumber);
+    doc["instNr"].set(instructionnumber);
+    doc["BRet"].set(nrbytesreturned);
 
-    Serial.println("KOMPO");
+    for(int k = 0; k < nrbytesreturned; k++)
+    {
+        doc["Data"].add(values[k]);
+    }
 
+    if(serializeJson(doc, Serial))
+    {
+        succes =1;
+    }
+
+    doc.clear();
     return succes;
 }
 
@@ -258,8 +289,13 @@ uint8_t Controller::parseData(DynamicJsonDocument doc)
         }
         break;
     
-    case 3: /* Executing simple instruction */
-
+    case 3: /* Adding simple instruction */
+         if(writeSingleInReg(sensorAdd, registerAddress, bitNr, bitValue))
+        {
+            succes = 1;
+            break;
+        }
+        case 4: /* Executing simple instruction */
          if(writeSingleInReg(sensorAdd, registerAddress, bitNr, bitValue))
         {
             succes = 1;
