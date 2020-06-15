@@ -2,8 +2,8 @@
 #define I2CCONTROLLER_H
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <ArduinoJson.h>
+
 
 #include "I2Cdev.h"
 
@@ -18,14 +18,7 @@ struct Instruction {
 
     Instruction(){};
 
-    Instruction(uint8_t instructionnumber, uint8_t registeraddress, uint8_t bitnum, bool bitvalue, uint8_t nrbytesReturned)
-    {
-        instructionNumber = instructionnumber;
-        registerAddress = registeraddress;
-        bitNum = bitnum;
-        bitValue = bitvalue;
-        nrBytesReturned = nrbytesReturned;
-    }
+    uint8_t requestFirst = 0;
 
     uint8_t instructionNumber = 0;
 
@@ -41,8 +34,6 @@ struct Instruction {
 
   
 }  ;
-
-
 
 struct Sensor{
 
@@ -69,10 +60,6 @@ struct Sensor{
     
 } ;
 
-/* COMMUNICATION */
-
-
-
 class Controller 
 {
     public:
@@ -88,8 +75,6 @@ class Controller
     void printSensors();
 
     void refresh();
-
-    void refresh2();
     
     Sensor sensors[MAX_SENSORS];
 
@@ -99,39 +84,23 @@ class Controller
 
     uint8_t parseData(DynamicJsonDocument doc);
 
-    void simpleJson();
-    
     private:
 
     /* SENSORS */
 
-    //I2Cdev connection;
+    I2Cdev connection;
 
     uint8_t numOfSens = 0;
 
-    uint8_t writeInReg(uint8_t address, uint8_t value);
-
-    uint8_t writeSingleInReg(uint8_t sensoraddress, uint8_t regaddress, uint8_t bitNum, bool value);
-
-    uint8_t readFromReg (uint8_t a0ddress, uint8_t nrbytesreturned, uint8_t values[]);
-
-    uint8_t readSensor(Sensor sensor, Instruction instruction);
-
-    uint8_t addSensor( uint8_t sensornumber, uint8_t address);
+    uint8_t addSensor( uint8_t *sensornumber, uint8_t *address);
     
-    uint8_t addInstruction(uint8_t sensornumber, uint8_t instructionnumber ,uint8_t registeraddress, uint8_t bitnum, bool bitvalue, uint8_t nrbytesreturned);
-
-    uint8_t addInstruction(uint8_t sensornumber, uint8_t instructionnumber, uint8_t registeraddress, uint8_t nrbytesreturned);
-
-    uint8_t execInstruction(uint8_t sensoraddress, uint8_t reqbyte, uint8_t nrbytesreturned);
+    uint8_t addInstruction(uint8_t *sensornumber, uint8_t *instructionnumber ,uint8_t *requestfirst, uint8_t *registeraddress, uint8_t *bitnum, bool *bitvalue, uint8_t *nrbytesreturned);
 
     /* COMMUNICATION */
 
-    uint8_t sendData(uint8_t sensornumber, uint8_t instructionnumber, uint8_t values[], uint8_t nrbytesreturned);
+    uint8_t sendData(uint8_t *sensornumber, uint8_t *instructionnumber, uint8_t values[], uint8_t *nrbytesreturned);
 
     uint8_t receiveData();
-
-    void returnFault(Sensor sensor, Instruction insruction);
 
 };
 #endif
