@@ -145,7 +145,6 @@ uint8_t Controller::receiveData()
     uint8_t succes = 0;
 
     String buffer = Serial.readString();
-    Serial.println(buffer);
     
     DynamicJsonDocument doc(1024);
 
@@ -153,7 +152,6 @@ uint8_t Controller::receiveData()
 
     if(err == DeserializationError::Ok){
         
-        Serial.println("yyet");
         
         if(parseData(doc))
         {
@@ -169,10 +167,9 @@ uint8_t Controller::parseData(DynamicJsonDocument doc)
 {
    
     uint8_t succes = 0;
-
     int commandType = doc["type"].as<int>();
     uint8_t instructionType = doc["inType"].as<uint8_t>();
-    uint8_t sensorNr = doc["sensNr"];
+    uint8_t sensorNr = doc["sensNr"].as<int>();
     uint8_t sensorAdd = doc["sensAdd"].as<uint8_t>();
     uint8_t instructionNr = doc["instNr"].as<uint8_t>();
     uint8_t registerAddress = doc["reqB"]. as<uint8_t>();
@@ -180,8 +177,6 @@ uint8_t Controller::parseData(DynamicJsonDocument doc)
     uint8_t bitNr = doc["bNr"].as<uint8_t>();
     bool bitValue = doc["bVal"].as<bool>();
 
-    Serial.println(sensorNr);
-    Serial.println("Parsing");
     switch (commandType)
     {
     case 1: /* Adding sensor */
@@ -223,9 +218,21 @@ void Controller::checkMessages()
 {
     if(Serial.available())
     {
-       if(receiveData() == 0)
-       {
-           Serial.println("Serial read error");
-       }
+      uint8_t succes = 0;
+
+        String buffer = Serial.readString();
+        
+        DynamicJsonDocument doc(1024);
+
+        DeserializationError err = deserializeJson(doc, buffer);
+        
+        
+        if(err == DeserializationError::Ok){
+        
+            if(parseData(doc))
+            {
+                succes = 1;
+            }
+        }
     }
 }
